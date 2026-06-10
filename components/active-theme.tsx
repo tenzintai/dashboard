@@ -1,0 +1,70 @@
+"use client";
+
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
+const COOKIE_NAME = "active_theme";
+const DEFAULT_THEME = "default";
+
+function setThemeCookie(theme: string) {
+  if (typeof window === "undefined") return;
+
+  document.cookie = `${COOKIE_NAME}=${theme}; path=/; max-age=31536000; SameSite=Lax; ${
+    window.location.protocol === "https:" ? "Secure;" : ""
+  }`;
+}
+
+type ThemeContextType = {
+  activeTheme: string;
+  setActiveTheme: (theme: string) => void;
+};
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export function ActiveThemeProvider({
+  children,
+  initialTheme,
+}: {
+  children: ReactNode;
+  initialTheme?: string;
+}) {
+  const [activeTheme, setActiveTheme] = useState(
+    initialTheme || DEFAULT_THEME
+  );
+
+  // apply theme
+  useEffect(() => {
+    setThemeCookie(activeTheme);
+
+    const root = document.documentElement;
+
+    root.classList.forEach((c) => {
+      if (c.startsWith("theme-")) root.classList.remove(c);
+    });
+
+    root.classList.add(`theme-${activeTheme}`);
+
+    if (activeTheme.endsWith("-scaled")) {
+      root.classList.add("theme-scaled");
+    }
+  }, [activeTheme]);
+
+  return (
+    <ThemeContext.Provider value={{ activeTheme, setActiveTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useThemeConfig() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useThemeConfig must be used within ActiveThemeProvider");
+  }
+  return context;
+}
