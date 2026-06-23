@@ -1,25 +1,18 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
-import { DataTable } from "@/components/data-table"
+import { SystemHealth } from "@/components/system-health"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { Suspense } from "react"
 
-async function getUsers() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/users`, {
-    cache: "no-store",
-  })
-  if (!res.ok) return []
-  return res.json()
-}
-
-export default async function UsersPage() {
-  const users = await getUsers()
-
+export default function ServerPage() {
   return (
     <SidebarProvider
-      style={{
-        "--sidebar-width": "calc(var(--spacing) * 72)",
-        "--header-height": "calc(var(--spacing) * 12)",
-      } as React.CSSProperties}
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
@@ -28,12 +21,16 @@ export default async function UsersPage() {
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="px-4 lg:px-6">
-                <h1 className="text-xl font-semibold">Users</h1>
+                <h1 className="text-xl font-semibold">Server Health</h1>
                 <p className="text-sm text-muted-foreground">
-                  Manage registered users on your homeserver
+                  Real-time metrics from your Dendrite homeserver
                 </p>
               </div>
-              <DataTable data={users} />
+              <div className="px-4 lg:px-6">
+                <Suspense fallback={<div className="text-sm text-muted-foreground">Loading metrics...</div>}>
+                  <SystemHealth />
+                </Suspense>
+              </div>
             </div>
           </div>
         </div>

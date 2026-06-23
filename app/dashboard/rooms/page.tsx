@@ -1,9 +1,19 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
-import { RoomsTable, mockRooms } from "@/components/rooms-table"
+import { RoomsTable } from "@/components/rooms-table"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
-export default function RoomsPage() {
+async function getRooms() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/rooms`, {
+    cache: "no-store",
+  })
+  if (!res.ok) return []
+  return res.json()
+}
+
+export default async function RoomsPage() {
+  const rooms = await getRooms()
+
   return (
     <SidebarProvider
       style={
@@ -25,7 +35,7 @@ export default function RoomsPage() {
                   Manage all rooms on your homeserver
                 </p>
               </div>
-              <RoomsTable data={mockRooms} />
+              <RoomsTable data={rooms} />
             </div>
           </div>
         </div>

@@ -544,17 +544,77 @@ function UserCellViewer({ user }: { user: User }) {
 
         {/* Quick actions */}
         <div className="flex gap-2 px-4 pb-2">
-          <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5 text-xs"
+            onClick={async () => {
+              try {
+                await fetch("/api/admin", {
+                  method: "DELETE",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    action: "resetPassword",
+                    userId: user.matrixId,
+                    password: Math.random().toString(36).slice(-10), // temp password
+                  }),
+                })
+                toast.success("Password reset successfully")
+              } catch (e) {
+                toast.error("Failed to reset password")
+              }
+            }}
+          >
             <ShieldCheckIcon className="size-3" />
-            {user.isAdmin ? "Demote" : "Make Admin"}
-          </Button>
-          <Button size="sm" variant="outline" className="text-xs">
             Reset Password
           </Button>
-          <Button size="sm" variant="destructive" className="ml-auto text-xs"
-            onClick={() => toast.error(`${user.displayName} deactivated`)}
+
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5 text-xs"
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/admin", {
+                  method: "DELETE",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    action: "whois",
+                    userId: user.matrixId,
+                  }),
+                })
+                const data = await res.json()
+                toast.success(`${Object.keys(data.devices || {}).length} active session(s)`)
+              } catch (e) {
+                toast.error("Failed to fetch user info")
+              }
+            }}
           >
-            Deactivate
+            Whois
+          </Button>
+
+          <Button
+            size="sm"
+            variant="destructive"
+            className="ml-auto text-xs"
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/admin", {
+                  method: "DELETE",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    action: "evacuateUser",
+                    userId: user.matrixId,
+                  }),
+                })
+                const data = await res.json()
+                toast.success(`Removed from ${data.affected?.length ?? 0} room(s)`)
+              } catch (e) {
+                toast.error("Failed to evacuate user")
+              }
+            }}
+          >
+            Evacuate
           </Button>
         </div>
 
@@ -590,7 +650,21 @@ function UserCellViewer({ user }: { user: User }) {
                     size="sm"
                     variant="ghost"
                     className="h-7 text-xs text-destructive hover:text-destructive"
-                    onClick={() => toast.error(`Kicked from #${room.name}`)}
+                    onClick={async () => {
+                      try {
+                        await fetch("/api/admin", {
+                          method: "DELETE",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            action: "evacuateUser",
+                            userId: user.matrixId,
+                          }),
+                        })
+                        toast.success(`Evacuated from all rooms`)
+                      } catch (e) {
+                        toast.error("Failed to kick user")
+                      }
+                    }}
                   >
                     Kick
                   </Button>

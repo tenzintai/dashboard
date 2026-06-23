@@ -1,19 +1,9 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
-import { DataTable } from "@/components/data-table"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { InstanceSettings } from "@/components/instance-settings"
 
-async function getUsers() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/users`, {
-    cache: "no-store",
-  })
-  if (!res.ok) return []
-  return res.json()
-}
-
-export default async function UsersPage() {
-  const users = await getUsers()
-
+export default function InstancePage() {
   return (
     <SidebarProvider
       style={{
@@ -28,12 +18,12 @@ export default async function UsersPage() {
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="px-4 lg:px-6">
-                <h1 className="text-xl font-semibold">Users</h1>
+                <h1 className="text-xl font-semibold">Instance Configuration</h1>
                 <p className="text-sm text-muted-foreground">
-                  Manage registered users on your homeserver
+                  Manage your Matrix homeserver settings
                 </p>
               </div>
-              <DataTable data={users} />
+              <InstanceSettings />
             </div>
           </div>
         </div>

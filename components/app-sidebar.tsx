@@ -6,6 +6,7 @@ import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
+import { SettingsIcon } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -69,6 +70,18 @@ const data = {
       title: "Reports",
       url: "/dashboard/reports",
       icon: <ShieldAlertIcon />,
+    },
+    {
+      title: "Instance",
+      url: "/dashboard/instance",
+      icon: <SettingsIcon />,
+      items: [
+        { title: "Branding", url: "/dashboard/instance/branding" },
+        { title: "Registration", url: "/dashboard/instance/registration" },
+        { title: "Federation", url: "/dashboard/instance/federation" },
+        { title: "Server Notices", url: "/dashboard/instance/notices" },
+        { title: "Media & Files", url: "/dashboard/instance/media" },
+      ],
     },
   ],
   navSecondary: [
